@@ -55,13 +55,23 @@ factor = cast((sampling_freq/target_F), "uint8");
 stopband_st = target_F/sampling_freq;
 passband_end = (target_F-2000)/sampling_freq;
 
-F = [0 passband_end stopband_st 1];
-A = [1 1 0 0];
-lpf = firls(255, F, A);
-filtered = filter(lpf, A, arr);
-cleaned = downsample(filtered, 5);
+FLow = [0 passband_end stopband_st 1];
+%FHigh = [0 passband_end stopband_st 1];
 
-sound(cleaned, Fs)
+ALow = [1 1 0 0];
+%AHigh = [0 0 1 1];
+
+lpf = firls(255, FLow, ALow);
+%hpf = firls(255, FHigh, AHigh);
+
+lowfiltered = filter(lpf, ALow, arr);
+%highfiltered = filter(hpf, AHigh, arr);
+
+lowcleaned = downsample(lowfiltered, factor);
+%highcleaned = downsample(highfiltered, factor);
+
+sound(lowcleaned, target_F)
+
 clf
 % Time Plot
 % % t = [0: length(y)-1]/ Fs;
@@ -70,18 +80,34 @@ clf
 % % xlabel("Time (sec)")
 % % ylabel("Magnitude")
 
-% Spectrogram
+% Spectrogram Lowpass
+figure;
+subplot(2, 1, 1);
 window = hamming(512);
 N_overlap = 256;
 N_fft = 1024;
-[S, F, T, P] = spectrogram(cleaned, window, N_overlap, N_fft, target_F, 'yaxis');
-figure;
+[S1, F1, T1, P1] = spectrogram(lowcleaned, window, N_overlap, N_fft, target_F, 'yaxis');
+surf(T1, F1, 10*log10(P1), 'edgecolor', 'none');
+axis tight;
+view(0,90);
+colormap(jet);
+set(gca,'clim', [-80 -20]);
+ylim([0 4000]);
+xlabel('Time (s)');
+ylabel('Frequency (Hz)');
+
+% Spectrogram Highpass
+subplot(2, 1, 2);
+window = hamming(512);
+N_overlap = 256;
+N_fft = 1024;
+[S, F, T, P] = spectrogram(lowcleaned, window, N_overlap, N_fft, target_F, 'yaxis');
 surf(T, F, 10*log10(P), 'edgecolor', 'none');
 axis tight;
 view(0,90);
 colormap(jet);
 set(gca,'clim', [-80 -20]);
-ylim([0 8000]);
+ylim([0 4000]);
 xlabel('Time (s)');
 ylabel('Frequency (Hz)');
 
