@@ -9,9 +9,7 @@ duration = 5;
 n = 0:(1/Fs):duration;
 amp = 1;
 
-
 y = amp*sin(w0*n);
-
 
 file1 = 'team[6]-stereosoundfile.wav';
 [arr, Fs] = audioread(file1);
@@ -22,7 +20,7 @@ info = audiodevinfo;
 nBits = 8;
 nChannels = 1;
 
-recorder = audiorecorder(Fs, nBits, nChannels, 1);
+%recorder = audiorecorder(Fs, nBits, nChannels, 1);
 
 pause(1);
 disp("Get Ready")
@@ -55,22 +53,21 @@ factor = cast((sampling_freq/target_F), "uint8");
 stopband_st = target_F/sampling_freq;
 passband_end = (target_F-2000)/sampling_freq;
 
-FLow = [0 passband_end stopband_st 1];
-%FHigh = [0 passband_end stopband_st 1];
+highpassband = target_F/10;
+disp(highpassband)
 
-ALow = [1 1 0 0];
-%AHigh = [0 0 1 1];
+F = [0 passband_end stopband_st 1];
+A = [1 1 0 0];
 
-lpf = firls(255, FLow, ALow);
-%hpf = firls(255, FHigh, AHigh);
+lpf = firls(255, F, A);
 
-lowfiltered = filter(lpf, ALow, arr);
-%highfiltered = filter(hpf, AHigh, arr);
+lowfiltered = filter(lpf, A, arr);
+highfiltered = highpass(arr, highpassband, target_F);
 
 lowcleaned = downsample(lowfiltered, factor);
-%highcleaned = downsample(highfiltered, factor);
+highcleaned = downsample(highfiltered, factor);
 
-sound(lowcleaned, target_F)
+%sound(lowcleaned, target_F)
 
 clf
 % Time Plot
@@ -82,22 +79,22 @@ clf
 
 % Spectrogram Lowpass
 figure;
-subplot(2, 1, 1);
 window = hamming(512);
 N_overlap = 256;
 N_fft = 1024;
-[S1, F1, T1, P1] = spectrogram(lowcleaned, window, N_overlap, N_fft, target_F, 'yaxis');
+[S1, F1, T1, P1] = spectrogram(highcleaned, window, N_overlap, N_fft, target_F, 'yaxis');
 surf(T1, F1, 10*log10(P1), 'edgecolor', 'none');
 axis tight;
 view(0,90);
 colormap(jet);
 set(gca,'clim', [-80 -20]);
 ylim([0 4000]);
+title('High Pass');
 xlabel('Time (s)');
 ylabel('Frequency (Hz)');
 
 % Spectrogram Highpass
-subplot(2, 1, 2);
+figure;
 window = hamming(512);
 N_overlap = 256;
 N_fft = 1024;
@@ -108,6 +105,7 @@ view(0,90);
 colormap(jet);
 set(gca,'clim', [-80 -20]);
 ylim([0 4000]);
+title('Low Pass');
 xlabel('Time (s)');
 ylabel('Frequency (Hz)');
 
