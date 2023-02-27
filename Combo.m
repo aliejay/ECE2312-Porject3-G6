@@ -33,6 +33,7 @@ stopband_st = target_F/sampling_freq;
 passband_end = (target_F-2000)/sampling_freq;
 
 highpassband = target_F/10;
+disp(highpassband)
 
 F = [0 passband_end stopband_st 1];
 A = [1 1 0 0];
@@ -43,6 +44,7 @@ FL = [0 passband_end/2 stopband_st/2 1];
 llpf = firls(255, FL, A);
 
 LHpassband = highpassband/4;
+disp(LHpassband)
 
 FH = [0 passband_end*1.5 stopband_st*1.5 1];
 hlpf = firls(255, FH, A);
@@ -92,7 +94,7 @@ arr1 = getaudiodata(recorder, "double");
 clf
 % Spectrogram LowLowpass
 figure;
-subplot(2, 2, 1);
+subplot(4, 1, 4);
 window = hamming(512);
 N_overlap = 256;
 N_fft = 1024;
@@ -103,12 +105,12 @@ view(0,90);
 colormap(jet);
 set(gca,'clim', [-80 -20]);
 title('Low Low Pass');
-ylim([0 4000]);
+ylim([0 2000]);
 xlabel('Time (s)');
 ylabel('Frequency (Hz)');
 
 % Spectrogram LowHighpass
-subplot(2, 2, 2);
+subplot(4, 1, 3);
 window = hamming(512);
 N_overlap = 256;
 N_fft = 1024;
@@ -118,13 +120,13 @@ axis tight;
 view(0,90);
 colormap(jet);
 set(gca,'clim', [-80 -20]);
-ylim([0 4000]);
+ylim([2000 4000]);
 title('Low High Pass');
 xlabel('Time (s)');
 ylabel('Frequency (Hz)');
 
 % Spectrogram HighLowpass
-subplot(2, 2, 3);
+subplot(4, 1, 1);
 window = hamming(512);
 N_overlap = 256;
 N_fft = 1024;
@@ -134,13 +136,13 @@ axis tight;
 view(0,90);
 colormap(jet);
 set(gca,'clim', [-80 -20]);
-ylim([0 4000]);
+ylim([2000 4000]);
 title('High High Pass');
 xlabel('Time (s)');
 ylabel('Frequency (Hz)');
 
 % Spectrogram HighHighpass
-subplot(2, 2, 4);
+subplot(4, 1, 2);
 window = hamming(512);
 N_overlap = 256;
 N_fft = 1024;
@@ -150,7 +152,7 @@ axis tight;
 view(0,90);
 colormap(jet);
 set(gca,'clim', [-80 -20]);
-ylim([0 4000]);
+ylim([0 2000]);
 title('High Low Pass');
 xlabel('Time (s)');
 ylabel('Frequency (Hz)');
