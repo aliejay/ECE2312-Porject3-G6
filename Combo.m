@@ -15,14 +15,14 @@ file1 = 'team[6]-stereosoundfile.wav';
 [arr, Fs] = audioread(file1);
 audioinfo(file1);
 
-% info = audiodevinfo;
-% info.input(1)
-% info.input(2)
+info = audiodevinfo;
+info.input(1)
+info.input(2)
 
 nBits = 8;
 nChannels = 1;
 
-%recorder = audiorecorder(Fs, nBits, nChannels, 1);
+recorder = audiorecorder(Fs, nBits, nChannels, 1);
 
 
 target_F = 8000;
@@ -33,7 +33,6 @@ stopband_st = target_F/sampling_freq;
 passband_end = (target_F-2000)/sampling_freq;
 
 highpassband = target_F/10;
-disp(highpassband)
 
 F = [0 passband_end stopband_st 1];
 A = [1 1 0 0];
@@ -44,7 +43,6 @@ FL = [0 passband_end/2 stopband_st/2 1];
 llpf = firls(255, FL, A);
 
 LHpassband = highpassband/4;
-disp(LHpassband)
 
 FH = [0 passband_end*1.5 stopband_st*1.5 1];
 hlpf = firls(255, FH, A);
@@ -81,14 +79,14 @@ pause(1);
 
 disp("Record")
 
-%record(recorder, duration);
+record(recorder, duration);
 sound(combo, target_F)
 
 % Wait 5 seconds
 pause(duration);
 disp("Recording over")
 
-%arr1 = getaudiodata(recorder, "double");
+arr1 = getaudiodata(recorder, "double");
 
 
 clf
@@ -158,6 +156,6 @@ xlabel('Time (s)');
 ylabel('Frequency (Hz)');
 
 % Save File
-% filename = 'team[6]-synthesized.wav';
-% audiowrite(filename,arr1,target_F);
-% audioinfo(filename);
+filename = 'team[6]-synthesized.wav';
+audiowrite(filename,arr1,target_F);
+audioinfo(filename);
